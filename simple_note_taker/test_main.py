@@ -8,7 +8,7 @@ from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization.serializers import DateTimeSerializer
 from typer.testing import CliRunner
 
-from .main import app, take, db
+from .main import app
 
 runner = CliRunner()
 
