@@ -12,22 +12,28 @@ from .main import app, take, db
 
 runner = CliRunner()
 
-serialization = SerializationMiddleware(MemoryStorage)
-serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
-test_db = TinyDB(
-    storage=serialization
-)
+
+def get_test_db():
+    serialization = SerializationMiddleware(MemoryStorage)
+    serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
+    return TinyDB(storage=serialization)
 
 
 class TestMain(TestCase):
 
-    def setUp(self) -> None:
-        pass
-
-    @patch('simple_note_taker.main.notes', new=test_db)
     def test_take(self):
-        runner.invoke(app, ["take"], input="test note\n")
-        print(test_db.all())
+        with patch('simple_note_taker.main.notes', new=get_test_db()) as test_db:
+            test_note = "test note"
+            runner.invoke(app, ["take"], input=f"{test_note}\n")
+            self.assertEqual(len(test_db.all()), 1)
+            self.assertEqual(test_db.all()[0]['content'], test_note)
+
+    def test_take2(self):
+        with patch('simple_note_taker.main.notes', new=get_test_db()) as test_db:
+            test_note = "test note"
+            runner.invoke(app, ["take"], input=f"{test_note}\n")
+            self.assertEqual(len(test_db.all()), 1)
+            self.assertEqual(test_db.all()[0]['content'], test_note)
 
     def test_search(self):
         self.fail()
