@@ -3,7 +3,6 @@ import re
 from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import typer
 from tinydb import TinyDB, Query, JSONStorage
@@ -19,9 +18,7 @@ if not Path(snt_home_dir).exists():
 
 db_file = os.sep.join([snt_home_dir, "database.json"])
 
-storage = JSONStorage
-
-serialization = SerializationMiddleware(storage)
+serialization = SerializationMiddleware(JSONStorage)
 serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
 
 db = TinyDB(
@@ -39,7 +36,6 @@ notes = db.table("notes")
 @dataclass
 class Note:
     content: str
-    doc_id: Optional[int] = None
     time_taken: datetime = datetime.now()
 
     def __repr__(self):
@@ -47,10 +43,8 @@ class Note:
 
 
 @app.command()
-def take():
-    now = datetime.now()
-    note_content = typer.prompt(f"{now.strftime('%a %d %b %Y')} | What is your note")
-    n_id = notes.insert(asdict(Note(note_content)))
+def take(note: str = typer.Option(..., prompt="Note content")):
+    n_id = notes.insert(asdict(Note(note)))
     typer.secho(f"Saved with id {n_id}.")
 
 
@@ -76,5 +70,4 @@ def edit(note_id: int):
 
 
 if __name__ == "__main__":
-    # app()
-    typer.run(search)
+    app()
