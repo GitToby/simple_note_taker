@@ -92,6 +92,9 @@ def latest(count: int = typer.Argument(10)):
 
 @app.command()
 def since(date: datetime = typer.Option(str(datetime.now().date() - timedelta(days=7)), prompt=True)):
+    """
+    Print notes since a given date
+    """
     search_res = [Note(**n, doc_id=n.doc_id) for n in notes.search(Query().time_taken > date)]
     typer.secho(f"Found {len(search_res)} notes since {date}")
     for note in search_res:
@@ -100,6 +103,9 @@ def since(date: datetime = typer.Option(str(datetime.now().date() - timedelta(da
 
 @app.command()
 def edit(note_id: int = typer.Argument(..., help="Note ID to of note edit")):
+    """
+    Edit a note in the DB
+    """
     notes_get = notes.get(doc_id=note_id)
     if notes_get is not None:
         note = Note(**notes_get, doc_id=notes_get.doc_id)
