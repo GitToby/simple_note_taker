@@ -1,6 +1,6 @@
 A simple CLI note taker, written in Python.
 
-start with
+Start with
 ```commandline
 pip install simple_note_taker
 ```
@@ -9,3 +9,5 @@ Then:
 ```commandline
 snt --help
 ```
+
+Dev with [Poetry](https://python-poetry.org/)
