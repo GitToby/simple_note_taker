@@ -1,28 +1,22 @@
-import os
 import re
 from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta
-from pathlib import Path
 
 import typer
 from tinydb import TinyDB, Query, JSONStorage
 from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization.serializers import DateTimeSerializer
 
+from simple_note_taker.config import get_conf
+
 app = typer.Typer()
-
-snt_home_dir = os.sep.join([str(Path.home()), ".simpleNoteTaker"])
-
-if not Path(snt_home_dir).exists():
-    os.mkdir(snt_home_dir)
-
-db_file = os.sep.join([snt_home_dir, "database.json"])
+conf = get_conf()
 
 serialization = SerializationMiddleware(JSONStorage)
 serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
 
 db = TinyDB(
-    path=db_file,
+    path=conf.db_file_path,
     storage=serialization,
     # json.dump() kwargs
     sort_keys=True,
@@ -54,6 +48,7 @@ class Note:
         return self.time_taken < other.time_taken
 
 
+# Insert Commands
 @app.command()
 def take(note: str = typer.Option(..., prompt="Note content")):
     """
@@ -65,6 +60,23 @@ def take(note: str = typer.Option(..., prompt="Note content")):
     typer.secho(f"Saved with id {n_id}.")
 
 
+@app.command()
+def edit(note_id: int = typer.Argument(..., help="Note ID to of note edit")):
+    """
+    Edit a note in the DB
+    """
+    notes_get = notes.get(doc_id=note_id)
+    if notes_get is not None:
+        note = Note(**notes_get, doc_id=notes_get.doc_id)
+        typer.secho(note.pretty_str())
+        update = typer.prompt("New content")
+        note.content = update
+        notes.update(note.as_insertable(), doc_ids=[note.doc_id])
+    else:
+        typer.secho(f"No note of ID {note_id}")
+
+
+# Retrieval commands
 @app.command()
 def search(term: str):
     """
@@ -101,20 +113,12 @@ def since(date: datetime = typer.Option(str(datetime.now().date() - timedelta(da
         typer.secho(" - " + note.pretty_str())
 
 
+# Backup Commands
 @app.command()
-def edit(note_id: int = typer.Argument(..., help="Note ID to of note edit")):
-    """
-    Edit a note in the DB
-    """
-    notes_get = notes.get(doc_id=note_id)
-    if notes_get is not None:
-        note = Note(**notes_get, doc_id=notes_get.doc_id)
-        typer.secho(note.pretty_str())
-        update = typer.prompt("New content")
-        note.content = update
-        notes.update(note.as_insertable(), doc_ids=[note.doc_id])
-    else:
-        typer.secho(f"No note of ID {note_id}")
+def backup():
+    # backup to a system based on config
+    typer.secho(f"Work in progress")
+    pass
 
 
 if __name__ == "__main__":
