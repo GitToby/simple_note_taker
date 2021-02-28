@@ -5,14 +5,14 @@ from typing import List
 import typer
 from tinydb import Query
 
-from simple_note_taker.config import APP_NAME, config
+from simple_note_taker.config import config
 from simple_note_taker.database import notes
 from simple_note_taker.help_texts import *
 from simple_note_taker.model import Note
 from simple_note_taker.subcommands.config import config_app
 from simple_note_taker.subcommands.notes import notes_app
 
-app = typer.Typer(name=APP_NAME)
+app = typer.Typer()
 app.add_typer(config_app, name="config")
 app.add_typer(notes_app, name="notes")
 

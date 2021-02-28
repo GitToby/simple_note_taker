@@ -13,4 +13,4 @@ Then:
 snt --help
 ```
 
-Dev with [Poetry](https://python-poetry.org/). Run tests from root with `pytest`
+Dev with [Poetry](https://python-poetry.org/). Run tests from root with `pytest --cov=simple_note_taker`

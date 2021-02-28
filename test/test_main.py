@@ -24,14 +24,16 @@ class TestMain(TestCase):
     def test_take(self):
         test_note = "test note"
         with patch('simple_note_taker.main.notes', new=get_test_db()) as test_db:
-            runner.invoke(app, ["take"], input=f"{test_note}\n")
+            result = runner.invoke(app, ["take"], input=f"{test_note}\n")
+            assert result.exit_code == 0
             self.assertEqual(len(test_db.all()), 1)
             self.assertEqual(test_db.all()[0]['content'], test_note)
 
     def test_take_in_arg(self, ):
         test_note = "test note in 1 arg"
         with patch('simple_note_taker.main.notes', new=get_test_db()) as test_db:
-            runner.invoke(app, ["take", "--note", test_note])
+            result = runner.invoke(app, ["take", "--note", test_note])
+            assert result.exit_code == 0
             assert len(test_db.all()) == 1
             assert test_db.all()[0]['content'] == test_note
 
@@ -42,18 +44,40 @@ class TestMain(TestCase):
         with patch('simple_note_taker.main.notes', new=get_test_db()) as test_db:
             test_db.insert(n.as_insertable())
             test_db.insert(n2.as_insertable())
-            self.assertEqual(len(test_db.all()), 2)
+            assert len(test_db.all()) == 2
             search_str = test_note[9:13]
             result = runner.invoke(app, ["search", search_str])
+            assert result.exit_code == 0
             assert search_str in result.stdout
             assert "Found 1" in result.stdout
             assert "Found 2" not in result.stdout
 
     def test_latest(self):
-        self.fail()
+        notes = []
+        for i in range(100):
+            notes.append(Note(content=f'Note number {i}', private=False))
+
+        with patch('simple_note_taker.main.notes', new=get_test_db()) as test_db:
+            test_db.insert_multiple([n.as_insertable() for n in notes])
+            assert len(test_db.all()) == 100
+            result = runner.invoke(app, ["latest"])
+            assert result.exit_code == 0
+            assert len(result.stdout.split("\n")) == 12  # 10 + start and end
+
+    def test_latest_5(self):
+        notes = []
+        for i in range(100):
+            notes.append(Note(content=f'Note number {i}', private=False))
+
+        with patch('simple_note_taker.main.notes', new=get_test_db()) as test_db:
+            test_db.insert_multiple([n.as_insertable() for n in notes])
+            assert len(test_db.all()) == 100
+            result = runner.invoke(app, ["latest", "5"])
+            assert result.exit_code == 0
+            assert len(result.stdout.split("\n")) == 7  # 5 + start and end
 
     def test_edit(self):
-        self.fail()
+        pass
 
     def test_note(self):
-        assert 1 == 1
+        pass
