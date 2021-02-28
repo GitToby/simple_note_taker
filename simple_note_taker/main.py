@@ -1,23 +1,28 @@
 import re
-from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta
+from typing import List
 
 import typer
-from tinydb import TinyDB, Query, JSONStorage
+from tinydb import JSONStorage, Query, TinyDB
 from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization.serializers import DateTimeSerializer
 
-from simple_note_taker.config import get_conf
+from simple_note_taker.config import APP_NAME, config
+from simple_note_taker.help_texts import *
+from simple_note_taker.model import Note
+from simple_note_taker.subcommands.config import config_app
+from simple_note_taker.subcommands.notes import notes_app
 
-app = typer.Typer()
-conf = get_conf()
+app = typer.Typer(name=APP_NAME)
+app.add_typer(config_app, name="config")
+app.add_typer(notes_app, name="notes")
 
-serialization = SerializationMiddleware(JSONStorage)
-serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
+_serialization = SerializationMiddleware(JSONStorage)
+_serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
 
 db = TinyDB(
-    path=conf.db_file_path,
-    storage=serialization,
+    path=config.db_file_path,
+    storage=_serialization,
     # json.dump() kwargs
     sort_keys=True,
     indent=4,
@@ -27,56 +32,24 @@ db = TinyDB(
 notes = db.table("notes")
 
 
-@dataclass
-class Note:
-    """
-    A crude ORM of sorts
-    """
-    content: str
-    doc_id: int = None
-    time_taken: datetime = datetime.now()
-
-    def pretty_str(self) -> str:
-        return f"Note {self.doc_id}: {self.time_taken.strftime('%H:%M, %a %d %b %Y')} | {self.content}"
-
-    def as_insertable(self) -> dict:
-        tmp = asdict(self)
-        del tmp['doc_id']  # this shouldn't be inserted into the db again
-        return tmp
-
-    def __lt__(self, other) -> bool:
-        return self.time_taken < other.time_taken
+def print_notes(notes_to_print: List[Note]) -> None:
+    for note in notes_to_print:
+        typer.secho(" - " + note.pretty_str())
 
 
 # Insert Commands
 @app.command()
-def take(note: str = typer.Option(..., prompt="Note content")):
+def take(note: str = typer.Option(..., prompt=TAKE_NOTE_PROMPT), private: bool = typer.Option(config.default_private)):
     """
     Take a note and save it.
     """
     note_content = note.strip()
-    n = Note(note_content)
+    n = Note(content=note_content, private=private)
     n_id = notes.insert(n.as_insertable())
     typer.secho(f"Saved with id {n_id}.")
 
 
-@app.command()
-def edit(note_id: int = typer.Argument(..., help="Note ID to of note edit")):
-    """
-    Edit a note in the DB
-    """
-    notes_get = notes.get(doc_id=note_id)
-    if notes_get is not None:
-        note = Note(**notes_get, doc_id=notes_get.doc_id)
-        typer.secho(note.pretty_str())
-        update = typer.prompt("New content")
-        note.content = update
-        notes.update(note.as_insertable(), doc_ids=[note.doc_id])
-    else:
-        typer.secho(f"No note of ID {note_id}")
-
-
-# Retrieval commands
+# Retrieval subcommands
 @app.command()
 def search(term: str):
     """
@@ -86,8 +59,7 @@ def search(term: str):
     search_res = notes.search(q.content.search(term, flags=re.IGNORECASE))
     found_notes = [Note(**n, doc_id=n.doc_id) for n in search_res]
     typer.secho(f"Found {len(found_notes)} notes matching \"{term}\"")
-    for i, note in enumerate(found_notes):
-        typer.secho(f'({i})\t{note}')
+    print_notes(found_notes)
 
 
 @app.command()
@@ -98,8 +70,7 @@ def latest(count: int = typer.Argument(10)):
     all_notes = [Note(**n, doc_id=n.doc_id) for n in notes.all()]
     latest_notes = sorted(all_notes, reverse=True)[:count]
     typer.secho(f"Last {min(count, len(latest_notes))} notes")
-    for note in latest_notes:
-        typer.secho(" - " + note.pretty_str())
+    print_notes(latest_notes)
 
 
 @app.command()
@@ -109,16 +80,7 @@ def since(date: datetime = typer.Option(str(datetime.now().date() - timedelta(da
     """
     search_res = [Note(**n, doc_id=n.doc_id) for n in notes.search(Query().time_taken > date)]
     typer.secho(f"Found {len(search_res)} notes since {date}")
-    for note in search_res:
-        typer.secho(" - " + note.pretty_str())
-
-
-# Backup Commands
-@app.command()
-def backup():
-    # backup to a system based on config
-    typer.secho(f"Work in progress")
-    pass
+    print_notes(search_res)
 
 
 if __name__ == "__main__":

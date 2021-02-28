@@ -1,14 +1,13 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from click import Context
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization.serializers import DateTimeSerializer
 from typer.testing import CliRunner
 
-from .main import app
+from simple_note_taker.main import app
 
 runner = CliRunner()
 
