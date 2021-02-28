@@ -1,6 +1,7 @@
 A simple CLI note taker, written in Python.
 
 Home: https://github.com/GitToby/simple_note_taker
+Pypi: https://pypi.org/project/simple-note-taker/
 
 Start with
 ```commandline
