@@ -1,7 +1,8 @@
 import typer
 
+from simple_note_taker.database import notes
 from simple_note_taker.help_texts import NOTES_APP_HELP, NOTES_EDIT_NOTE_ID_HELP
-from simple_note_taker.main import Note, notes
+from simple_note_taker.model import Note
 
 notes_app = typer.Typer(help=NOTES_APP_HELP)
 

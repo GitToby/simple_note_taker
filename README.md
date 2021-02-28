@@ -13,4 +13,4 @@ Then:
 snt --help
 ```
 
-Dev with [Poetry](https://python-poetry.org/)
+Dev with [Poetry](https://python-poetry.org/). Run tests from root with `pytest`
