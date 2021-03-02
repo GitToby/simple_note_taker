@@ -7,8 +7,7 @@ authors = ["Toby Devlin <toby@tobydevlin.com>"]
 readme = 'README.md'
 repository = "https://github.com/GitToby/simple_note_taker"
 classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Environment :: Consoles"
+    "Development Status :: 3 - Alpha"
 ]
 
 [tool.poetry.scripts]
