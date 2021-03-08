@@ -22,7 +22,7 @@ def get_test_db():
 class TestMain(TestCase):
     def test_take(self):
         test_note = "test note"
-        with patch("simple_note_taker.main.notes", new=get_test_db()) as test_db:
+        with patch("simple_note_taker.main.notes_db", new=get_test_db()) as test_db:
             result = runner.invoke(app, ["take"], input=f"{test_note}\n")
             assert result.exit_code == 0
             self.assertEqual(len(test_db.all()), 1)
@@ -30,7 +30,7 @@ class TestMain(TestCase):
 
     def test_take_in_arg(self):
         test_note = "test note in 1 arg"
-        with patch("simple_note_taker.main.notes", new=get_test_db()) as test_db:
+        with patch("simple_note_taker.main.notes_db", new=get_test_db()) as test_db:
             result = runner.invoke(app, ["take", "--note", test_note])
             assert result.exit_code == 0
             assert len(test_db.all()) == 1
@@ -40,7 +40,7 @@ class TestMain(TestCase):
         test_note = "test note to search from"
         n = Note(content=test_note, private=False)
         n2 = Note(content="no common chars", private=False)
-        with patch("simple_note_taker.main.notes", new=get_test_db()) as test_db:
+        with patch("simple_note_taker.main.notes_db", new=get_test_db()) as test_db:
             test_db.insert(n.as_insertable())
             test_db.insert(n2.as_insertable())
             assert len(test_db.all()) == 2
@@ -56,10 +56,10 @@ class TestMain(TestCase):
         for i in range(100):
             notes.append(Note(content=f"Note number {i}", private=False))
 
-        with patch("simple_note_taker.main.notes", new=get_test_db()) as test_db:
+        with patch("simple_note_taker.main.notes_db", new=get_test_db()) as test_db:
             test_db.insert_multiple([n.as_insertable() for n in notes])
             assert len(test_db.all()) == 100
-            result = runner.invoke(app, ["latest"])
+            result = runner.invoke(app, ["ls"])
             assert result.exit_code == 0
             assert len(result.stdout.split("\n")) == 12  # 10 + start and end
 
@@ -68,10 +68,10 @@ class TestMain(TestCase):
         for i in range(100):
             notes.append(Note(content=f"Note number {i}", private=False))
 
-        with patch("simple_note_taker.main.notes", new=get_test_db()) as test_db:
+        with patch("simple_note_taker.main.notes_db", new=get_test_db()) as test_db:
             test_db.insert_multiple([n.as_insertable() for n in notes])
             assert len(test_db.all()) == 100
-            result = runner.invoke(app, ["latest", "5"])
+            result = runner.invoke(app, ["ls", "5"])
             assert result.exit_code == 0
             assert len(result.stdout.split("\n")) == 7  # 5 + start and end
 
