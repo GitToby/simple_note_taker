@@ -13,6 +13,7 @@ class Note:
     # Database use
     content: str
     private: bool
+    shared: bool = False
     user: str = config.username
     taken_at: datetime = datetime.now()
 

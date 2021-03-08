@@ -114,8 +114,11 @@ def delete(
         typer.secho(note.pretty_str())
         if force or typer.prompt("Are you sure you want to delete this note?"):
             notes_db.remove(doc_ids=[note_id])
+            typer.secho(f"Note under ID {note_id} deleted.")
         else:
             typer.secho("Nothing deleted")
+    else:
+        typer.secho(f"No note under id {note_id} found.")
 
 
 if __name__ == "__main__":

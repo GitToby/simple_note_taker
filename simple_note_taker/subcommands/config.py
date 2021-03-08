@@ -27,6 +27,7 @@ def open_conf_path():
     """
     Open the config file location
     """
+    typer.secho("Opening config file...")
     typer.launch(str(config_file_path), locate=True)
 
 
@@ -49,3 +50,13 @@ def set_username(username: str = typer.Option(..., prompt=CONFIG_SET_USERNAME_PR
     config.username = username
     write_config_to_file(config)
     typer.secho(f"Updated username to: {config.username}")
+
+
+@config_app.command()
+def enable_sharing():
+    """
+    Updates the username in the configuration. This will also push change of username to any remote servers
+    """
+    config.share_enabled = True
+    write_config_to_file(config)
+    typer.secho(f"Sharing is now enabled with the default settings,")

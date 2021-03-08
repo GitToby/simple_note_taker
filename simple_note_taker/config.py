@@ -29,6 +29,8 @@ class MetaData:
 class Configuration:
     username: str = None
     default_private: bool = False
+    share_enabled: bool = False
+
     db_file_path: str = str(snt_home_dir / "database.json")
     metadata: MetaData = MetaData()
 
