@@ -2,7 +2,12 @@ from dataclasses import asdict
 
 import typer
 
-from simple_note_taker.config import Configuration, config, config_file_path, write_config_to_file
+from simple_note_taker.config import (
+    Configuration,
+    config,
+    config_file_path,
+    write_config_to_file,
+)
 from simple_note_taker.help_texts import CONFIG_APP_HELP, CONFIG_SET_USERNAME_PROMPT
 
 config_app = typer.Typer(help=CONFIG_APP_HELP)

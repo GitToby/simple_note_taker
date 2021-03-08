@@ -9,6 +9,7 @@ class Note:
     """
     A crude ORM of sorts
     """
+
     # Database use
     content: str
     private: bool
@@ -23,7 +24,7 @@ class Note:
 
     def as_insertable(self) -> dict:
         tmp = asdict(self)
-        del tmp['doc_id']  # this shouldn't be inserted into the db again
+        del tmp["doc_id"]  # this shouldn't be inserted into the db again
         return tmp
 
     def __lt__(self, other) -> bool:

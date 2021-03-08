@@ -2,7 +2,7 @@
 name = "simple_note_taker"
 version = "0.1.3"
 description = "A simple CLI Notetaker with options for centralization and summaries for teams"
-license = "GPL-3.0-or-later"
+license = "Apache-2.0"
 authors = ["Toby Devlin <toby@tobydevlin.com>"]
 readme = 'README.md'
 repository = "https://github.com/GitToby/simple_note_taker"
@@ -24,6 +24,7 @@ pytest-cov = "^2.11.1"
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
+black = { version = "^20.8b1", allow-prereleases = true }
 
 [build-system]
 requires = ["poetry_core>=1.0.0"]

@@ -6,9 +6,11 @@ from typing import Union
 
 from .__version__ import VERSION
 
-APP_NAME = 'simpleNoteTaker'
+APP_NAME = "simpleNoteTaker"
 
-snt_home_dir = Path().home() / f'.{APP_NAME}'  # maybe migrate to `typer.get_app_dir(APP_NAME)`
+snt_home_dir = (
+        Path().home() / f".{APP_NAME}"
+)  # maybe migrate to `typer.get_app_dir(APP_NAME)`
 config_file_path = snt_home_dir / "config.json"
 
 # init the config dir location
@@ -18,7 +20,9 @@ if not Path(snt_home_dir).exists():
 
 @dataclass
 class MetaData:
-    cli_version: str = VERSION  # used for when we need to prompt to update the cli config
+    cli_version: str = (
+        VERSION  # used for when we need to prompt to update the cli config
+    )
 
 
 @dataclass
@@ -30,9 +34,9 @@ class Configuration:
 
 
 def write_config_to_file(configuration: Configuration):
-    with open(config_file_path, 'w+') as f:
+    with open(config_file_path, "w+") as f:
         conf_dict = asdict(configuration)
-        json.dump(conf_dict, f, sort_keys=True, indent=4, separators=(',', ': '))
+        json.dump(conf_dict, f, sort_keys=True, indent=4, separators=(",", ": "))
 
 
 def read_config_from_file(file_path: Union[str, Path]) -> Configuration:

@@ -2,3 +2,4 @@
 dist
 .venv
 .idea
+.coverage
