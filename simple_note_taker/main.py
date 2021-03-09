@@ -39,7 +39,7 @@ def take(
 @app.command()
 def search(term: str):
     """
-    Search your notes you've saved previously
+    Search your notes you've saved previously.
     """
     q = Query()
     search_res = notes_db.search(q.content.search(term, flags=re.IGNORECASE))
@@ -51,7 +51,7 @@ def search(term: str):
 @app.command()
 def ls(count: int = typer.Argument(10)):
     """
-    Fetch the latest notes you've taken
+    Fetch the latest notes you've taken.
     """
     all_notes = [Note(**n, doc_id=n.doc_id) for n in notes_db.all()]
     latest_notes = sorted(all_notes, reverse=True)[:count]
@@ -59,14 +59,14 @@ def ls(count: int = typer.Argument(10)):
     print_notes(latest_notes)
 
 
-@app.command()
+# Todo: enable
 def since(
         date: datetime = typer.Option(
             str(datetime.now().date() - timedelta(days=7)), prompt=True
         )
 ):
     """
-    Print notes since a given date
+    Print notes since a given date.
     """
     search_res = [
         Note(**n, doc_id=n.doc_id) for n in notes_db.search(Query().time_taken > date)
@@ -79,7 +79,7 @@ def since(
 @app.command()
 def size():
     """
-    Returns details on the size of you notes
+    Returns details on the size of you notes.
     """
     typer.secho(f"There are {len(notes_db)} notes in the database")
 
@@ -106,7 +106,7 @@ def delete(
         force: bool = typer.Option(False),
 ):
     """
-    Delete a note in the DB
+    Delete a note in the DB.
     """
     notes_get = notes_db.get(doc_id=note_id)
     if notes_get is not None:

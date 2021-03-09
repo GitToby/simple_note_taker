@@ -20,6 +20,7 @@ colorama = "^0.4.4"
 tinydb = "^4.4.0"
 tinydb-serialization = "^2.1.0"
 pytest-cov = "^2.11.1"
+pydantic = "^1.8.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
