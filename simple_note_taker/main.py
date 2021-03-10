@@ -5,7 +5,7 @@ import typer
 from tinydb import Query
 
 from simple_note_taker.config import config
-from simple_note_taker.core.model import Note, notes
+from simple_note_taker.core.notes import NoteInDB, Note, Notes
 from simple_note_taker.help_texts import *
 from simple_note_taker.subcommands.config import config_app
 
@@ -13,7 +13,7 @@ app = typer.Typer()
 app.add_typer(config_app, name="config")
 
 
-def print_notes(notes_to_print: List[Note]) -> None:
+def print_notes(notes_to_print: List[NoteInDB]) -> None:
     for note in notes_to_print:
         typer.secho(" - " + note.pretty_str())
 
@@ -28,9 +28,8 @@ def take(
     Take a note and save it.
     """
     note_content = note.strip()
-    n = Note(content=note_content, private=private)
-    n_id = notes_db.insert(n.as_insertable())
-    typer.secho(f"Saved with id {n_id}.")
+    note = Note(content=note_content, private=private).save()
+    typer.secho(f"Saved with id {note.doc_id}.")
 
 
 # Retrieval subcommands
@@ -39,7 +38,7 @@ def search(term: str):
     """
     Search your notes you've saved previously.
     """
-    found_notes = notes.search(term, "content")
+    found_notes = Notes.search(term, "content")
     typer.secho(f'Found {len(found_notes)} notes matching "{term}"')
     print_notes(found_notes)
 
@@ -49,26 +48,10 @@ def ls(count: int = typer.Argument(10)):
     """
     Fetch the latest notes you've taken.
     """
-    all_notes = notes.all()
+    all_notes = Notes.all()
     latest_notes = sorted(all_notes, reverse=True)[:count]
     typer.secho(f"Last {min(count, len(latest_notes))} notes")
     print_notes(latest_notes)
-
-
-# Todo: enable
-def since(
-        date: datetime = typer.Option(
-            str(datetime.now().date() - timedelta(days=7)), prompt=True
-        )
-):
-    """
-    Print notes since a given date.
-    """
-    search_res = [
-        Note(**n, doc_id=n.doc_id) for n in notes_db.search(Query().time_taken > date)
-    ]
-    typer.secho(f"Found {len(search_res)} notes since {date}")
-    print_notes(search_res)
 
 
 # Editing
@@ -77,7 +60,7 @@ def size():
     """
     Returns details on the size of you notes.
     """
-    typer.secho(f"There are {len(notes_db)} notes in the database")
+    typer.secho(f"There are {len(Notes.all())} notes in the database")
 
 
 @app.command()
@@ -85,13 +68,12 @@ def edit(note_id: int = typer.Argument(..., help=NOTES_EDIT_NOTE_ID_HELP)):
     """
     Edit a note in the DB
     """
-    notes_get = notes_db.get(doc_id=note_id)
-    if notes_get is not None:
-        note = Note(**notes_get, doc_id=notes_get.doc_id)
+    note = Notes.get_by_id(note_id)
+    if note is not None:
         typer.secho(note.pretty_str())
         update = typer.prompt("New content")
         note.content = update
-        notes_db.update(note.as_insertable(), doc_ids=[note.doc_id])
+        note.save()
     else:
         typer.secho(f"No note of ID {note_id}")
 
@@ -104,12 +86,11 @@ def delete(
     """
     Delete a note in the DB.
     """
-    notes_get = notes_db.get(doc_id=note_id)
-    if notes_get is not None:
-        note = Note(**notes_get, doc_id=notes_get.doc_id)
+    note = Notes.get_by_id(note_id)
+    if note is not None:
         typer.secho(note.pretty_str())
         if force or typer.prompt("Are you sure you want to delete this note?"):
-            notes_db.remove(doc_ids=[note_id])
+            note.delete()
             typer.secho(f"Note under ID {note_id} deleted.")
         else:
             typer.secho("Nothing deleted")
