@@ -15,5 +15,3 @@ tiny_db = TinyDB(
     indent=4,
     separators=(",", ": "),
 )
-
-notes_db = tiny_db.table("notes")

@@ -1,4 +1,3 @@
-import re
 from datetime import datetime, timedelta
 from typing import List
 
@@ -6,9 +5,8 @@ import typer
 from tinydb import Query
 
 from simple_note_taker.config import config
-from simple_note_taker.database.core import notes_db
+from simple_note_taker.core.model import Note, notes
 from simple_note_taker.help_texts import *
-from simple_note_taker.model import Note
 from simple_note_taker.subcommands.config import config_app
 
 app = typer.Typer()
@@ -41,9 +39,7 @@ def search(term: str):
     """
     Search your notes you've saved previously.
     """
-    q = Query()
-    search_res = notes_db.search(q.content.search(term, flags=re.IGNORECASE))
-    found_notes = [Note(**n, doc_id=n.doc_id) for n in search_res]
+    found_notes = notes.search(term, "content")
     typer.secho(f'Found {len(found_notes)} notes matching "{term}"')
     print_notes(found_notes)
 
@@ -53,7 +49,7 @@ def ls(count: int = typer.Argument(10)):
     """
     Fetch the latest notes you've taken.
     """
-    all_notes = [Note(**n, doc_id=n.doc_id) for n in notes_db.all()]
+    all_notes = notes.all()
     latest_notes = sorted(all_notes, reverse=True)[:count]
     typer.secho(f"Last {min(count, len(latest_notes))} notes")
     print_notes(latest_notes)

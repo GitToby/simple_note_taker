@@ -7,8 +7,8 @@ from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization.serializers import DateTimeSerializer
 from typer.testing import CliRunner
 
+from simple_note_taker.core.model import Note
 from simple_note_taker.main import app
-from simple_note_taker.model import Note
 
 runner = CliRunner()
 
