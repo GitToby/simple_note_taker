@@ -7,9 +7,10 @@ from pydantic.main import BaseModel
 from tinydb import Query
 
 from simple_note_taker.config import config
-from simple_note_taker.core.database import tiny_db, NOTES_TABLE_NAME
+from simple_note_taker.core.database import tiny_db, NOTES_TABLE_NAME, REMINDERS_TABLE_NAME
 
 _notes_db = tiny_db.table(NOTES_TABLE_NAME)
+_reminders_db = tiny_db.table(REMINDERS_TABLE_NAME)
 
 
 class _NoteModel(BaseModel):
@@ -31,22 +32,24 @@ class _NoteModel(BaseModel):
         return self.taken_at < other.taken_at
 
 
+def _remind_me_parse(note: 'Note'):
+    logging.info(f'_remind_me_parse for {note.content}')
+
+
+MAGIC_COMMANDS = {
+    "!remindme": _remind_me_parse
+}
+
+
 class Note(_NoteModel):
     """
     Class for creating notes and saving them, to ensure the create hooks are run.
     """
 
-    def _remind_me_parse(self):
-        logging.info(f'_remind_me_parse for {self.content}')
-
-    MAGIC_COMMANDS = {
-        "!remindme": _remind_me_parse
-    }
-
     def save(self) -> 'NoteInDB':
-        commands = [cmd for cmd in self.MAGIC_COMMANDS if cmd in self.content.lower()]
+        commands = [cmd for cmd in MAGIC_COMMANDS if cmd in self.content.lower()]
         for command in commands:
-            self.MAGIC_COMMANDS[command]()
+            MAGIC_COMMANDS[command](self)
 
         note_id = _notes_db.insert(self.dict())
         return Notes.get_by_id(note_id)

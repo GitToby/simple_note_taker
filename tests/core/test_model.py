@@ -19,6 +19,7 @@ reminders_db = test_db.table("reminders")
 
 
 @patch('simple_note_taker.core.notes._notes_db', new=notes_db)
+@patch('simple_note_taker.core.notes._reminders_db', new=notes_db)
 class TestNoteModel(TestCase):
     def setUp(self) -> None:
         test_db.drop_tables()
@@ -35,7 +36,7 @@ class TestNoteModel(TestCase):
         self.assertLess(note_1, note_2)
 
     def test_create_and_execute_magic_remind_me(self):
-        note = Note(content="test content", private=False)
+        note = Note(content="test content with !remindMe 2d", private=False)
         self.assertEqual(0, len(notes_db.all()))
         note.save()
         self.assertEqual(1, len(notes_db.all()))
