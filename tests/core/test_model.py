@@ -1,8 +1,8 @@
-import time
 from datetime import datetime
 from unittest import TestCase
 from unittest.mock import patch
 
+import dateparser
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 from tinydb_serialization import SerializationMiddleware
@@ -15,32 +15,36 @@ _serialization.register_serializer(DateTimeSerializer(), "TinyDate")
 
 test_db = TinyDB(storage=_serialization)
 notes_db = test_db.table("notes")
-reminders_db = test_db.table("reminders")
 
 
 @patch('simple_note_taker.core.notes._notes_db', new=notes_db)
-@patch('simple_note_taker.core.notes._reminders_db', new=notes_db)
-class TestNoteModel(TestCase):
+class TestNoteModelDBInteractions(TestCase):
     def setUp(self) -> None:
         test_db.drop_tables()
 
     def test_create_and_save_note(self):
-        note = Note(content="test content", private=False)
+        note = Note("test content")
         self.assertEqual(0, len(notes_db.all()))
         note.save()
         self.assertEqual(1, len(notes_db.all()))
 
+
+@patch('simple_note_taker.core.notes._notes_db', new=notes_db)
+class TestNoteModel(TestCase):
     def test_ordering(self):
-        note_1 = Note(content="test note 1", private=False, taken_at=datetime(2021, 1, 1))
-        note_2 = Note(content="test note 2", private=False)
+        note_1 = Note("test note 1", taken_at=datetime(2021, 1, 1))
+        note_2 = Note("test note 2")
         self.assertLess(note_1, note_2)
 
     def test_create_and_execute_magic_remind_me(self):
-        note = Note(content="test content with !remindMe 2d", private=False)
-        self.assertEqual(0, len(notes_db.all()))
-        note.save()
-        self.assertEqual(1, len(notes_db.all()))
+        note = Note("test content with !remindMe").save()
+        assert note.task is True
 
-# class TestNoteInDBModel(TestCase):
-#     def test_pretty_str(self):
-#         self.assertEqual(0, 1)
+    def test_retester(self):
+        exs = [
+            "2w",
+            "2d2h 5mins",
+        ]
+        print(datetime.now())
+        for e in exs:
+            print(dateparser.parse(e))
