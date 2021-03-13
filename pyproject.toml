@@ -28,6 +28,14 @@ pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
 black = { version = "^20.8b1", allow-prereleases = true }
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+console_output_style = "count"
+addopts = "-v --cov=simple_note_taker --cov-report html --cov-report term"
+testpaths = [
+    "tests"
+]
+
 [build-system]
 requires = ["poetry_core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

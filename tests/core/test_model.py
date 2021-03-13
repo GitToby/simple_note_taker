@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from unittest import TestCase
 from unittest.mock import patch
 
-import pytimeparse
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 from tinydb_serialization import SerializationMiddleware
@@ -21,7 +20,7 @@ notes_db = test_db.table("notes")
 @patch('simple_note_taker.core.notes._notes_db', new=notes_db)
 class TestNoteModelDBInteractions(TestCase):
     def setUp(self) -> None:
-        test_db.drop_tables()
+        notes_db.truncate()
 
     def test_create_and_save_note(self):
         note = Note("test content")
@@ -32,6 +31,9 @@ class TestNoteModelDBInteractions(TestCase):
 
 @patch('simple_note_taker.core.notes._notes_db', new=notes_db)
 class TestNoteModel(TestCase):
+    def setUp(self) -> None:
+        notes_db.truncate()
+
     def test_ordering(self):
         note_1 = Note("test note 1", taken_at=datetime(2021, 1, 1))
         note_2 = Note("test note 2")
@@ -49,7 +51,7 @@ class TestNoteModel(TestCase):
         assert note.task is True
         assert note.reminder is not None
         assert type(note.reminder) is datetime
-        self.assertAlmostEqual(note.reminder, datetime.now() + timedelta(days=2, hours=4))
+        self.assertAlmostEqual(note.reminder, datetime.now() + timedelta(days=2, hours=4), 1)
 
     def test_create_and_not_execute_magic_remind_me(self):
         note = Note("please remindMe in 2d4h to do something").save()

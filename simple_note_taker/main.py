@@ -3,7 +3,7 @@ from typing import List
 import typer
 
 from simple_note_taker.config import config
-from simple_note_taker.core.notes import Note, NoteInDB, Notes
+from simple_note_taker.core.notes import Note, NoteInDB, Notes, DATE_FORMAT
 from simple_note_taker.help_texts import *
 from simple_note_taker.subcommands.config import config_app
 
@@ -33,15 +33,32 @@ def take(
         private: bool = typer.Option(config.default_private),
 ):
     """
-    Take a note and save it.
+    Take a note and save it. Include any of the magic commands to execute their functionality.
+
+    Magic commands:
+    !task - Mark a note as a task,
+    !todo - Same as !task
+    !chore - Same as !task
+    !remindme - Mark note as a task and set a reminder. Optionally include a single timeframe block 'e.g. 2m1w4d2h5s' to set reminder date.
+    !reminder - Same as !remindme
+    !alert - Same as !remindme
+    !private - Marks a note as private as its saved
+    !secret - Same as !private
     """
     note_content = note.strip()
     note = Note(content=note_content, private=private).save()
-    typer.secho(f"Saved with id {note.doc_id}.")
+    note_str = 'Note'
+    reminder_str = ''
+    if note.task:
+        note_str = 'Task'
+        if note.reminder:
+            reminder_str = f'Reminder set for {note.reminder.strftime(DATE_FORMAT)}'
+
+    typer.secho(f"{note_str} saved with id {note.doc_id}. {reminder_str}")
 
 
 # Retrieval subcommands
-@app.command()
+@app.command()  # also have a "match" command which is abolute
 def search(term: str):
     """
     Search your notes you've saved previously.
@@ -67,25 +84,29 @@ def ls(count: int = typer.Argument(10, help=LS_COUNT_HELP)):
 @app.command()
 def tasks(include_complete: bool = typer.Option(False), count: int = typer.Argument(10, help=LS_COUNT_HELP)):
     """
-    Lists all the task notes that are not complete, sorted by due date.
+    Lists notes marked as Tasks.
     """
     all_tasks = Notes.all_tasks(include_complete)
     if count == 0:
         count = len(all_tasks)
     latest_notes = sorted(all_tasks, reverse=True)[:count]
-    typer.secho(f"Last {min(count, len(latest_notes))} notes")
+    typer.secho(f"Last {min(count, len(latest_notes))} tasks:")
     print_notes(latest_notes)
 
 
 @app.command()
-def mark_done(note_id=typer.Argument(...)):
+def mark_done(note_id: int = typer.Argument(...)):
+    """
+    Mark a task type note as done.
+    """
     note = Notes.get_by_id(note_id)
     if note is not None:
         note.mark_as_done()
-        note.save()
+        note.update(run_magic=False)
         typer.secho(f"Marked note {note_id} as done.")
     else:
         typer.secho(f"No note under id {note_id} found.")
+        raise typer.Abort()
 
 
 # Editing
@@ -100,16 +121,18 @@ def size():
 @app.command()
 def edit(note_id: int = typer.Argument(..., help=EDIT_NOTE_ID_HELP)):
     """
-    Edit a note in the DB
+    Edit a note you've taken.
     """
     note = Notes.get_by_id(note_id)
     if note is not None:
         typer.secho(note.pretty_str())
         update = typer.prompt("New content")
         note.content = update
-        note.save()
+        note.update()
+        typer.secho(f"Note {note_id} updated.")
     else:
-        typer.secho(f"No note of ID {note_id}")
+        typer.secho(f"No note of ID {note_id} found.")
+        raise typer.Abort()
 
 
 @app.command()
@@ -118,7 +141,7 @@ def delete(
         force: bool = typer.Option(False),
 ):
     """
-    Delete a note in the DB.
+    Delete a note you've taken.
     """
     note = Notes.get_by_id(note_id)
     if note is not None:
@@ -129,6 +152,7 @@ def delete(
             typer.secho(f"Note under ID {note_id} deleted.")
     else:
         typer.secho(f"No note under id {note_id} found.")
+        raise typer.Abort()
 
 
 if __name__ == "__main__":

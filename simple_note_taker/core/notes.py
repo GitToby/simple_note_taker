@@ -5,11 +5,14 @@ from typing import List, Optional
 from pytimeparse import parse
 from pydantic.main import BaseModel
 from tinydb import Query
+from tinydb.table import Table
 
 from simple_note_taker.config import config
 from simple_note_taker.core.database import NOTES_TABLE_NAME, tiny_db
 
-_notes_db = tiny_db.table(NOTES_TABLE_NAME)
+DATE_FORMAT = '%H:%M, %a %d %b %Y'
+
+_notes_db: Table = tiny_db.table(NOTES_TABLE_NAME)
 
 
 class Note(BaseModel):
@@ -38,7 +41,7 @@ class Note(BaseModel):
         return "Unsaved note"
 
     def pretty_str(self) -> str:
-        time_taken_str = self.taken_at.strftime('%H:%M, %a %d %b %Y')
+        time_taken_str = self.taken_at.strftime(DATE_FORMAT)
 
         task_str = "    "
         if self.task:
@@ -55,11 +58,10 @@ class Note(BaseModel):
     def _remind_me_parse(self):
         """
         Given a note, we should process and save a reminder which maps back to the content.
-        We also only search the single succeeding string after the magic command.
         Examples:
             '!remindme 3d i should take out the bins!' - should set a task with reminder to today + 3 days
             '!remindme that i need to make dinner' - should set a task with a reminder thats due now
-            '!remindme that in 3d i should take out the bins!' -
+            '!remindme that in 3d i should create the 3d models!' - will parse the first 3d but not the second
         """
         parse_times = [parse(s) for s in self.content.split(" ") if parse(s) is not None]
         delta_seconds = 0 if len(parse_times) == 0 else parse_times[0]
@@ -73,18 +75,27 @@ class Note(BaseModel):
         if reminder_delta is not None:
             self.reminder = datetime.now() + reminder_delta
 
+    def _private_parse(self):
+        self.private = True
+
+    def _run_magic(self):
+        magic_commands = {
+            "!todo": self._task_parse,
+            "!task": self._task_parse,
+            "!chore": self._task_parse,
+            "!remindme": self._remind_me_parse,
+            "!reminder": self._remind_me_parse,
+            "!alert": self._remind_me_parse,
+            "!private": self._private_parse,
+            "!secret": self._private_parse
+        }
+        commands = {cmd for cmd in magic_commands if cmd in self.content.lower()}
+        for command in commands:
+            magic_commands[command]()
+
     def save(self, run_magic=True) -> 'NoteInDB':
         if run_magic:
-            magic_commands = {
-                "!todo": self._task_parse,
-                "!task": self._task_parse,
-                "!chore": self._task_parse,
-                "!remindme": self._remind_me_parse,
-            }
-
-            commands = [cmd for cmd in magic_commands if cmd in self.content.lower()]
-            for command in commands:
-                magic_commands[command]()
+            self._run_magic()
 
         note_id = _notes_db.insert(self.dict())
         return Notes.get_by_id(note_id)
@@ -105,7 +116,15 @@ class NoteInDB(Note):
         return f"Note {self.doc_id}"
 
     def delete(self) -> int:
-        return _notes_db.remove(doc_ids=[self.doc_id])
+        remove_res = _notes_db.remove(doc_ids=[self.doc_id])
+        return remove_res[0]
+
+    def update(self, run_magic=False):
+        if run_magic:
+            self._run_magic()
+
+        update_res = _notes_db.update(self.dict(exclude={"doc_id"}), doc_ids=[self.doc_id])
+        return update_res
 
 
 class Notes:
@@ -137,7 +156,7 @@ class Notes:
 
     @staticmethod
     def all_tasks(include_complete: bool = False) -> List[NoteInDB]:
-        search_res = _notes_db.search(Query()["task"] is True)
+        search_res = _notes_db.search(Query()["task"] == True)
         tasks = [NoteInDB(**n, doc_id=n.doc_id) for n in search_res]
         if include_complete:
             return tasks
