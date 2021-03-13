@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "simple_note_taker"
-version = "0.2.1"
-description = "A simple CLI Notetaker with options for centralization and summaries for teams"
+version = "0.2.2"
+description = "A simple CLI Notetaker with magic commands and options for centralization and summaries for teams"
 license = "Apache-2.0"
 authors = ["Toby Devlin <toby@tobydevlin.com>"]
 readme = 'README.md'
