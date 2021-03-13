@@ -1,8 +1,9 @@
-from datetime import datetime
+import re
+from datetime import datetime, timedelta
 from unittest import TestCase
 from unittest.mock import patch
 
-import dateparser
+import pytimeparse
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 from tinydb_serialization import SerializationMiddleware
@@ -39,12 +40,18 @@ class TestNoteModel(TestCase):
     def test_create_and_execute_magic_remind_me(self):
         note = Note("test content with !remindMe").save()
         assert note.task is True
+        assert note.reminder is not None
+        assert type(note.reminder) is datetime
+        self.assertAlmostEqual(note.reminder, datetime.now(), 1, "Should remind instantly")
 
-    def test_retester(self):
-        exs = [
-            "2w",
-            "2d2h 5mins",
-        ]
-        print(datetime.now())
-        for e in exs:
-            print(dateparser.parse(e))
+    def test_create_and_execute_magic_remind_me_future(self):
+        note = Note("please !remindMe in 2d4h to do something").save()
+        assert note.task is True
+        assert note.reminder is not None
+        assert type(note.reminder) is datetime
+        self.assertAlmostEqual(note.reminder, datetime.now() + timedelta(days=2, hours=4))
+
+    def test_create_and_not_execute_magic_remind_me(self):
+        note = Note("please remindMe in 2d4h to do something").save()
+        assert note.task is False
+        assert note.reminder is None

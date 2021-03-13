@@ -21,7 +21,7 @@ tinydb = "^4.4.0"
 tinydb-serialization = "^2.1.0"
 pytest-cov = "^2.11.1"
 pydantic = "^1.8.1"
-dateparser = "^1.0.0"
+pytimeparse = "^1.1.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"

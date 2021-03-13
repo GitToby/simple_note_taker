@@ -2,6 +2,7 @@ import re
 from datetime import datetime, timedelta
 from typing import List, Optional
 
+from pytimeparse import parse
 from pydantic.main import BaseModel
 from tinydb import Query
 
@@ -54,12 +55,15 @@ class Note(BaseModel):
     def _remind_me_parse(self):
         """
         Given a note, we should process and save a reminder which maps back to the content.
+        We also only search the single succeeding string after the magic command.
         Examples:
             '!remindme 3d i should take out the bins!' - should set a task with reminder to today + 3 days
             '!remindme that i need to make dinner' - should set a task with a reminder thats due now
+            '!remindme that in 3d i should take out the bins!' -
         """
-
-        self._task_parse(timedelta(0))
+        parse_times = [parse(s) for s in self.content.split(" ") if parse(s) is not None]
+        delta_seconds = 0 if len(parse_times) == 0 else parse_times[0]
+        self._task_parse(timedelta(seconds=delta_seconds))
 
     def _task_parse(self, reminder_delta: Optional[timedelta] = None):
         """
