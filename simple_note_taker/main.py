@@ -71,8 +71,8 @@ def take(
 
 
 # Retrieval subcommands
-@app.command()  # also have a "match" command which is abolute
-def search(term: str):
+@app.command()
+def match(term: str):
     """
     Search your notes you've saved previously.
     """

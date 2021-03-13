@@ -62,7 +62,7 @@ class TestTakeMain(TestCase):
         print(result.stdout)
         assert "saved with id 1" in result.stdout.lower()
 
-    def test_search(self):
+    def test_match(self):
         runner.invoke(app, ["take", "--note", "note one"])
         runner.invoke(app, ["take", "--note", "note two"])
         runner.invoke(app, ["take", "--note", "note three"])
@@ -70,10 +70,10 @@ class TestTakeMain(TestCase):
         assert "one" in ls_res.stdout
         assert "two" in ls_res.stdout
         assert "three" in ls_res.stdout
-        search_res = runner.invoke(app, ["search", "three"])
-        assert search_res.exit_code == 0
-        assert "note one" not in search_res.stdout
-        assert "note three" in search_res.stdout
+        match_res = runner.invoke(app, ["match", "three"])
+        assert match_res.exit_code == 0
+        assert "note one" not in match_res.stdout
+        assert "note three" in match_res.stdout
 
     def test_ls(self):
         for i in range(15):
