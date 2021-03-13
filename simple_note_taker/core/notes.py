@@ -1,7 +1,11 @@
 import re
 from datetime import datetime, timedelta
 from typing import List, Optional
+import warnings
 
+warnings.filterwarnings("ignore", category=UserWarning)  # shuts up the fuzzy native c++ import
+
+from fuzzywuzzy import fuzz, process
 from pytimeparse import parse
 from pydantic.main import BaseModel
 from tinydb import Query
@@ -150,10 +154,19 @@ class Notes:
             return NoteInDB(**res, doc_id=res.doc_id)
 
     @staticmethod
-    def search(query: str, field: str) -> List[NoteInDB]:
+    def find_match(query: str, field: str) -> List[NoteInDB]:
         query = Query()[field].search(query, flags=re.IGNORECASE)
         search_res = _notes_db.search(query)
         return [NoteInDB(**n, doc_id=n.doc_id) for n in search_res]
+
+    @staticmethod
+    def search(query: str, result_size: int = 5) -> List[NoteInDB]:
+        all_notes_dict = {note.doc_id: note.content for note in Notes.all()}
+        search_results = process.extractBests(query,
+                                              choices=all_notes_dict,
+                                              scorer=fuzz.token_set_ratio,
+                                              limit=result_size)
+        return [Notes.get_by_id(res_record[2]) for res_record in search_results]
 
     @staticmethod
     def all_tasks(include_complete: bool = False) -> List[NoteInDB]:

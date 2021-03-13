@@ -6,7 +6,6 @@ from simple_note_taker.config import config
 from simple_note_taker.core.notes import Note, NoteInDB, Notes, DATE_FORMAT
 from simple_note_taker.help_texts import *
 from simple_note_taker.subcommands.config import config_app
-
 import pkg_resources
 
 _DISTRIBUTION_METADATA = pkg_resources.get_distribution("simple_note_taker")
@@ -74,9 +73,16 @@ def take(
 @app.command()
 def match(term: str):
     """
-    Search your notes you've saved previously.
+    Search your notes you've saved previously which match a search term.
     """
-    found_notes = Notes.search(term, "content")
+    found_notes = Notes.find_match(term, "content")
+    typer.secho(f'Found {len(found_notes)} notes matching "{term}"')
+    print_notes(found_notes)
+
+
+@app.command()
+def search(term: str, limit: int = typer.Argument(5)):
+    found_notes = Notes.search(term, limit)
     typer.secho(f'Found {len(found_notes)} notes matching "{term}"')
     print_notes(found_notes)
 

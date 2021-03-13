@@ -52,6 +52,7 @@ class TestTakeMain(TestCase):
         result2 = runner.invoke(app, ["ls"])
         assert result.exit_code == 0
         assert "1 reminders due" in result2.stdout.lower()
+        assert " [ ] " in result2.stdout.lower()
         assert test_note in result2.stdout
 
     def test_take_in_arg(self):
