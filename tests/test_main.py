@@ -105,32 +105,33 @@ class TestTakeMain(TestCase):
         assert len(result.stdout.split("\n")) == 7
 
     def test_tasks(self):
-        runner.invoke(app, ["take", "--note", f"!task number 1"])
-        runner.invoke(app, ["take", "--note", f"!chore number 2"])
-        runner.invoke(app, ["take", "--note", f"!todo number 3"])
+        runner.invoke(app, ["take", "--note", "!task number 1"])
+        runner.invoke(app, ["take", "--note", "!chore number 2"])
+        runner.invoke(app, ["take", "--note", "!todo number 3"])
         result = runner.invoke(app, ["tasks"])
         assert result.exit_code == 0
         assert len(result.stdout.split("\n")) == 5
 
     def test_tasks_all(self):
-        runner.invoke(app, ["take", "--note", f"!task number 1"])
-        runner.invoke(app, ["take", "--note", f"!chore number 2"])
-        runner.invoke(app, ["take", "--note", f"!todo number 3"])
+        runner.invoke(app, ["take", "--note", "!task number 1"])
+        runner.invoke(app, ["take", "--note", "!chore number 2"])
+        runner.invoke(app, ["take", "--note", "!todo number 3"])
         for i in range(15):
             runner.invoke(app, ["take", "--note", f"!todo number {i}"])
         result = runner.invoke(app, ["tasks", "0"])
         assert result.exit_code == 0
         assert len(result.stdout.split("\n")) == 20
 
-    def test_tasks_with_done(self):
-        runner.invoke(app, ["take", "--note", f"!task number 1"])
-        runner.invoke(app, ["take", "--note", f"!task number 2"])
+    def test_tasks_with_include_done(self):
+        runner.invoke(app, ["take", "--note", "!task number 1"])
+        runner.invoke(app, ["take", "--note", "!task number 2"])
         runner.invoke(app, ["mark-done", "1"])
         result = runner.invoke(app, ["tasks"])
         assert result.exit_code == 0
         assert len(result.stdout.split("\n")) == 3
         result2 = runner.invoke(app, ["tasks", "--include-complete"])
         assert result2.exit_code == 0
+        assert f"[x] | !task number 1" in result2.stdout.lower()
         assert len(result2.stdout.split("\n")) == 4
 
     def test_mark_done(self):

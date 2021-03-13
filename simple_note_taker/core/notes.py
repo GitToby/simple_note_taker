@@ -33,7 +33,6 @@ class Note(BaseModel):
     def __init__(self, content: str, **data):
         """
         All other fields have defaults and should be altered with helper methods in NoteInDB
-        :param content:
         """
         super().__init__(content=content, **data)
 
@@ -42,13 +41,10 @@ class Note(BaseModel):
 
     def pretty_str(self) -> str:
         time_taken_str = self.taken_at.strftime(DATE_FORMAT)
-
-        task_str = "    "
+        task_str = "   "
         if self.task:
             task_x = "x" if self.task_complete else " "
-            task_r = "R" if self.reminder is not None and self.reminder > datetime.now() else " "
-
-            task_str = f"{task_r}[{task_x}]"  # e.g. R[x] for a task which had a reminder and is done
+            task_str = f"[{task_x}]"  # e.g. [x] for a task which is done
 
         return f"{self._note_id_str()}: {time_taken_str} | {task_str} | {self.content}"
 
@@ -113,7 +109,12 @@ class NoteInDB(Note):
     doc_id: int = None
 
     def _note_id_str(self) -> str:
-        return f"Note {self.doc_id}"
+        spacer = ""
+        if self.doc_id < 10:
+            spacer = "  "
+        elif self.doc_id < 100:
+            spacer = " "
+        return f"Note {self.doc_id}{spacer}"
 
     def delete(self) -> int:
         remove_res = _notes_db.remove(doc_ids=[self.doc_id])

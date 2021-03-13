@@ -23,10 +23,11 @@ def version_callback(value: bool):
 def check_for_reminders(version: Optional[bool] = typer.Option(None, "--version", callback=version_callback)):
     reminders = Notes.due_reminders()
     if len(reminders) > 0:
-        typer.secho(f"{len(reminders)} reminders due! Mark these as done soon.")
-        typer.secho("---------------------------------------")
+        reminder_str = f"{len(reminders)} reminders due! Mark these as done soon."
+        typer.secho(reminder_str)
+        typer.secho("-" * len(reminder_str))
         print_notes(reminders)
-        typer.secho("---------------------------------------")
+        typer.secho("-" * len(reminder_str))
 
 
 app = typer.Typer(name="Simple Note Taker", callback=check_for_reminders)
