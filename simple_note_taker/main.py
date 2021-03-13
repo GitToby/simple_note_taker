@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import typer
 
@@ -7,8 +7,20 @@ from simple_note_taker.core.notes import Note, NoteInDB, Notes, DATE_FORMAT
 from simple_note_taker.help_texts import *
 from simple_note_taker.subcommands.config import config_app
 
+import pkg_resources
 
-def check_for_reminders():
+_DISTRIBUTION_METADATA = pkg_resources.get_distribution("simple_note_taker")
+
+__version__ = _DISTRIBUTION_METADATA.version
+
+
+def version_callback(value: bool):
+    if value:
+        typer.echo(__version__)
+        raise typer.Exit()
+
+
+def check_for_reminders(version: Optional[bool] = typer.Option(None, "--version", callback=version_callback)):
     reminders = Notes.due_reminders()
     if len(reminders) > 0:
         typer.secho(f"{len(reminders)} reminders due! Mark these as done soon.")
@@ -17,7 +29,7 @@ def check_for_reminders():
         typer.secho("---------------------------------------")
 
 
-app = typer.Typer(callback=check_for_reminders)
+app = typer.Typer(name="Simple Note Taker", callback=check_for_reminders)
 app.add_typer(config_app, name="config")
 
 

@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Union
 
-from .__version__ import VERSION
+from simple_note_taker import __version__
 
 APP_NAME = "simpleNoteTaker"
 
@@ -21,7 +21,7 @@ if not Path(snt_home_dir).exists():
 @dataclass
 class MetaData:
     cli_version: str = (
-        VERSION  # used for when we need to prompt to update the cli config
+        __version__  # used for when we need to prompt to update the cli config
     )
 
 

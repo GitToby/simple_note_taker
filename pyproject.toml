@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "simple_note_taker"
-version = "0.1.3"
+version = "0.2.0"
 description = "A simple CLI Notetaker with options for centralization and summaries for teams"
 license = "Apache-2.0"
 authors = ["Toby Devlin <toby@tobydevlin.com>"]
