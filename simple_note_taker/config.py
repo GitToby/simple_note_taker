@@ -4,13 +4,11 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Union
 
-from .__version__ import VERSION
+from simple_note_taker import __version__
 
 APP_NAME = "simpleNoteTaker"
 
-snt_home_dir = (
-        Path().home() / f".{APP_NAME}"
-)  # maybe migrate to `typer.get_app_dir(APP_NAME)`
+snt_home_dir = Path().home() / f".{APP_NAME}"  # maybe migrate to `typer.get_app_dir(APP_NAME)`
 config_file_path = snt_home_dir / "config.json"
 
 # init the config dir location
@@ -20,9 +18,7 @@ if not Path(snt_home_dir).exists():
 
 @dataclass
 class MetaData:
-    cli_version: str = (
-        VERSION  # used for when we need to prompt to update the cli config
-    )
+    cli_version: str = __version__  # used for when we need to prompt to update the cli config
 
 
 @dataclass
