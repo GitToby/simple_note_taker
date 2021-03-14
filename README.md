@@ -3,6 +3,16 @@ A simple CLI note taker, written in Python.
 Home: https://github.com/GitToby/simple_note_taker
 Pypi: https://pypi.org/project/simple-note-taker/
 
+# Features
+
+* Take notes via CLI and save to a flat json file.
+* Configure tasks and reminders in notes with magic commands such as `!task` and `!reminder`.
+* Search your notes with fuzzy matching or exact term matching.
+
+## Coming Soon
+* Optionally, share notes with other users via rest of the s3 protocol. Server app coming soon.
+* Summary commands will let you consolidate competed tasks, general notes and other items and share in a verity of methods.
+
 # Install
 
 Via `pip`
@@ -39,4 +49,6 @@ Commands:
   tasks      Lists notes marked as Tasks.
 ```
 
-Dev with [Poetry](https://python-poetry.org/). Run tests from root with `pytest --cov=simple_note_taker`
+# Dev Setup
+
+Dev with [Poetry](https://python-poetry.org/). Run tests from root with `pytest`
