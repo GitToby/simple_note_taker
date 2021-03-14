@@ -14,7 +14,7 @@ from tinydb.table import Table
 from simple_note_taker.config import config
 from simple_note_taker.core.database import NOTES_TABLE_NAME, tiny_db
 
-DATE_FORMAT = '%H:%M, %a %d %b %Y'
+DATE_FORMAT = "%H:%M, %a %d %b %Y"
 
 _notes_db: Table = tiny_db.table(NOTES_TABLE_NAME)
 
@@ -87,13 +87,13 @@ class Note(BaseModel):
             "!reminder": self._remind_me_parse,
             "!alert": self._remind_me_parse,
             "!private": self._private_parse,
-            "!secret": self._private_parse
+            "!secret": self._private_parse,
         }
         commands = {cmd for cmd in magic_commands if cmd in self.content.lower()}
         for command in commands:
             magic_commands[command]()
 
-    def save(self, run_magic=True) -> 'NoteInDB':
+    def save(self, run_magic=True) -> "NoteInDB":
         if run_magic:
             self._run_magic()
 
@@ -109,6 +109,7 @@ class NoteInDB(Note):
     A note from the database is the same as a note but with a doc ID value.
     This model can be updated
     """
+
     # App use
     doc_id: int = None
 
@@ -162,10 +163,9 @@ class Notes:
     @staticmethod
     def search(query: str, result_size: int = 5) -> List[NoteInDB]:
         all_notes_dict = {note.doc_id: note.content for note in Notes.all()}
-        search_results = process.extractBests(query,
-                                              choices=all_notes_dict,
-                                              scorer=fuzz.token_set_ratio,
-                                              limit=result_size)
+        search_results = process.extractBests(
+            query, choices=all_notes_dict, scorer=fuzz.token_set_ratio, limit=result_size
+        )
         return [Notes.get_by_id(res_record[2]) for res_record in search_results]
 
     @staticmethod
@@ -180,8 +180,8 @@ class Notes:
     @staticmethod
     def due_reminders():
         now = datetime.now()
-        return [note for note in Notes.all() if
-                note.task
-                and not note.task_complete
-                and note.reminder is not None
-                and note.reminder < now]
+        return [
+            note
+            for note in Notes.all()
+            if note.task and not note.task_complete and note.reminder is not None and note.reminder < now
+        ]

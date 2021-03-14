@@ -41,8 +41,8 @@ def print_notes(notes_to_print: List[NoteInDB]) -> None:
 # Insert Commands
 @app.command()
 def take(
-        note: str = typer.Option(..., prompt=TAKE_NOTE_PROMPT),
-        private: bool = typer.Option(config.default_private),
+    note: str = typer.Option(..., prompt=TAKE_NOTE_PROMPT),
+    private: bool = typer.Option(config.default_private),
 ):
     """
     Take a note and save it. Include any of the magic commands to execute their functionality.
@@ -59,12 +59,12 @@ def take(
     """
     note_content = note.strip()
     note = Note(content=note_content, private=private).save()
-    note_str = 'Note'
-    reminder_str = ''
+    note_str = "Note"
+    reminder_str = ""
     if note.task:
-        note_str = 'Task'
+        note_str = "Task"
         if note.reminder:
-            reminder_str = f'Reminder set for {note.reminder.strftime(DATE_FORMAT)}'
+            reminder_str = f"Reminder set for {note.reminder.strftime(DATE_FORMAT)}"
 
     typer.secho(f"{note_str} saved with id {note.doc_id}. {reminder_str}")
 
@@ -156,8 +156,8 @@ def edit(note_id: int = typer.Argument(..., help=EDIT_NOTE_ID_HELP)):
 
 @app.command()
 def delete(
-        note_id: int = typer.Argument(..., help=DELETE_NOTE_ID_HELP),
-        force: bool = typer.Option(False),
+    note_id: int = typer.Argument(..., help=DELETE_NOTE_ID_HELP),
+    force: bool = typer.Option(False),
 ):
     """
     Delete a note you've taken.
@@ -165,8 +165,7 @@ def delete(
     note = Notes.get_by_id(note_id)
     if note is not None:
         typer.secho(note.pretty_str())
-        if force or typer.confirm("Are you sure you want to delete this note?",
-                                  abort=True):
+        if force or typer.confirm("Are you sure you want to delete this note?", abort=True):
             note.delete()
             typer.secho(f"Note under ID {note_id} deleted.")
     else:

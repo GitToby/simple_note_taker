@@ -17,7 +17,7 @@ test_db = TinyDB(storage=_serialization)
 notes_db = test_db.table("notes")
 
 
-@patch('simple_note_taker.core.notes._notes_db', new=notes_db)
+@patch("simple_note_taker.core.notes._notes_db", new=notes_db)
 class TestNoteModelDBInteractions(TestCase):
     def setUp(self) -> None:
         notes_db.truncate()
@@ -29,7 +29,7 @@ class TestNoteModelDBInteractions(TestCase):
         self.assertEqual(1, len(notes_db.all()))
 
 
-@patch('simple_note_taker.core.notes._notes_db', new=notes_db)
+@patch("simple_note_taker.core.notes._notes_db", new=notes_db)
 class TestNoteModel(TestCase):
     def setUp(self) -> None:
         notes_db.truncate()

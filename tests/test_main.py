@@ -19,7 +19,7 @@ test_db = TinyDB(storage=_serialization)
 _notes_db = test_db.table("notes")
 
 
-@patch('simple_note_taker.core.notes._notes_db', new=_notes_db)
+@patch("simple_note_taker.core.notes._notes_db", new=_notes_db)
 class TestTakeMain(TestCase):
     def setUp(self) -> None:
         _notes_db.truncate()
