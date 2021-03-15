@@ -64,16 +64,18 @@ class TestTakeMain(TestCase):
         assert "saved with id 1" in result.stdout.lower()
 
     def test_match(self):
-        runner.invoke(app, ["take", "--note", "note one"])
-        runner.invoke(app, ["take", "--note", "note two"])
-        runner.invoke(app, ["take", "--note", "note three"])
+        runner.invoke(app, ["take", "--note", "note one", "--tags", "one,no tag, another tag"])
+        runner.invoke(app, ["take", "--note", "note two", "--tags", "two,three, another tag"])
+        runner.invoke(app, ["take", "--note", "note three", "--tags", "three"])
         ls_res = runner.invoke(app, ["ls"])
+        assert ls_res.exit_code == 0
         assert "one" in ls_res.stdout
         assert "two" in ls_res.stdout
         assert "three" in ls_res.stdout
         match_res = runner.invoke(app, ["match", "three"])
         assert match_res.exit_code == 0
         assert "note one" not in match_res.stdout
+        assert "note two" in match_res.stdout
         assert "note three" in match_res.stdout
 
     def test_ls(self):

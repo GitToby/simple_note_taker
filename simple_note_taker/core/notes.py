@@ -23,6 +23,7 @@ class Note(BaseModel):
 
     # Database use
     content: str
+    tags: List[str] = []
     private: bool = config.default_private
     shared: bool = False
     task: bool = False  # tasks are a subset of notes
@@ -150,6 +151,15 @@ class Notes:
             return None
         else:
             return NoteInDB(**res, doc_id=res.doc_id)
+
+    @staticmethod
+    def find_by_tags(tags_list: List[str], union=False):
+        if union:
+            query = Query().tags.all(tags_list)
+        else:
+            query = Query().tags.any(tags_list)
+        search_res = _notes_db.search(query)
+        return [NoteInDB(**n, doc_id=n.doc_id) for n in search_res]
 
     @staticmethod
     def find_match(query: str, field: str) -> List[NoteInDB]:

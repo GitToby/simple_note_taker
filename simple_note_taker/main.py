@@ -43,22 +43,23 @@ def print_notes(notes_to_print: List[NoteInDB]) -> None:
 def take(
         note: str = typer.Option(..., prompt=TAKE_NOTE_PROMPT),
         private: bool = typer.Option(config.default_private),
+        tags: str = typer.Option(None, help=TAKE_NOTE_TAGS_HELP)
 ):
     """
     Take a note and save it. Include any of the magic commands to execute their functionality.
 
     Magic commands:
-    !task - Mark a note as a task,
-    !todo - Same as !task
-    !chore - Same as !task
+    !task - Mark a note as a task.
+    !todo - Same as !task.
+    !chore - Same as !task.
     !remindme - Mark note as a task and set a reminder. Optionally include a single timeframe block 'e.g. 2m1w4d2h5s' to set reminder date.
-    !reminder - Same as !remindme
-    !alert - Same as !remindme
-    !private - Marks a note as private as its saved
-    !secret - Same as !private
+    !reminder - Same as !remindme.
+    !alert - Same as !remindme.
+    !private - Marks a note as private as its saved.
+    !secret - Same as !private.
     """
     note_content = note.strip()
-    note = Note(content=note_content, private=private).save()
+    note = Note(content=note_content, private=private, tags=[t.strip() for t in tags.split(",")]).save()
     note_str = "Note"
     reminder_str = ""
     if note.task:
@@ -71,12 +72,13 @@ def take(
 
 # Retrieval subcommands
 @app.command()
-def match(term: str):
+def match(tags=typer.Argument(..., help=MATCH_TAGS_HELP)):
     """
-    Search your notes you've saved previously which match a search term.
+    Search your notes you've tagged.
     """
-    found_notes = Notes.find_match(term, "content")
-    typer.secho(f'Found {len(found_notes)} notes matching "{term}"')
+    tags_list = [t.strip() for t in tags.split(",")]
+    found_notes = Notes.find_by_tags(tags_list)
+    typer.secho(f'Found {len(found_notes)} with tags in "{tags_list}"')
     print_notes(found_notes)
 
 
