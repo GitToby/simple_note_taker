@@ -22,7 +22,7 @@ tinydb-serialization = "^2.1.0"
 pytest-cov = "^2.11.1"
 pydantic = "^1.8.1"
 pytimeparse = "^1.1.8"
-fuzzywuzzy = "^0.18.0"
+rapidfuzz = "^1.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"

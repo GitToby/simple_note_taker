@@ -8,7 +8,6 @@ _serialization = SerializationMiddleware(JSONStorage)
 _serialization.register_serializer(DateTimeSerializer(), "TinyDate")
 
 NOTES_TABLE_NAME = "notes"
-REMINDERS_TABLE_NAME = "reminders"
 
 tiny_db = TinyDB(
     path=config.db_file_path,

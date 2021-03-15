@@ -1,13 +1,10 @@
 import re
 from datetime import datetime, timedelta
 from typing import List, Optional
-import warnings
 
-warnings.filterwarnings("ignore", category=UserWarning)  # shuts up the fuzzy native c++ import
-
-from fuzzywuzzy import fuzz, process
-from pytimeparse import parse
 from pydantic.main import BaseModel
+from pytimeparse import parse
+from rapidfuzz import fuzz, process
 from tinydb import Query
 from tinydb.table import Table
 
@@ -163,8 +160,8 @@ class Notes:
     @staticmethod
     def search(query: str, result_size: int = 5) -> List[NoteInDB]:
         all_notes_dict = {note.doc_id: note.content for note in Notes.all()}
-        search_results = process.extractBests(
-            query, choices=all_notes_dict, scorer=fuzz.token_set_ratio, limit=result_size
+        search_results = process.extract(
+            query, choices=all_notes_dict, scorer=fuzz.token_set_ratio, limit=result_size, score_cutoff=20
         )
         return [Notes.get_by_id(res_record[2]) for res_record in search_results]
 

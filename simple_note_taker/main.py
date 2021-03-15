@@ -1,12 +1,12 @@
 from typing import List, Optional
 
+import pkg_resources
 import typer
 
 from simple_note_taker.config import config
-from simple_note_taker.core.notes import Note, NoteInDB, Notes, DATE_FORMAT
+from simple_note_taker.core.notes import DATE_FORMAT, Note, NoteInDB, Notes
 from simple_note_taker.help_texts import *
 from simple_note_taker.subcommands.config import config_app
-import pkg_resources
 
 _DISTRIBUTION_METADATA = pkg_resources.get_distribution("simple_note_taker")
 
@@ -41,8 +41,8 @@ def print_notes(notes_to_print: List[NoteInDB]) -> None:
 # Insert Commands
 @app.command()
 def take(
-    note: str = typer.Option(..., prompt=TAKE_NOTE_PROMPT),
-    private: bool = typer.Option(config.default_private),
+        note: str = typer.Option(..., prompt=TAKE_NOTE_PROMPT),
+        private: bool = typer.Option(config.default_private),
 ):
     """
     Take a note and save it. Include any of the magic commands to execute their functionality.
@@ -156,8 +156,8 @@ def edit(note_id: int = typer.Argument(..., help=EDIT_NOTE_ID_HELP)):
 
 @app.command()
 def delete(
-    note_id: int = typer.Argument(..., help=DELETE_NOTE_ID_HELP),
-    force: bool = typer.Option(False),
+        note_id: int = typer.Argument(..., help=DELETE_NOTE_ID_HELP),
+        force: bool = typer.Option(False),
 ):
     """
     Delete a note you've taken.
