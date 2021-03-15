@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "simple_note_taker"
-version = "0.2.2"
+version = "0.2.4"
 description = "A simple CLI Notetaker with magic commands and options for centralization and summaries for teams"
 license = "Apache-2.0"
 authors = ["Toby Devlin <toby@tobydevlin.com>"]
@@ -14,7 +14,7 @@ classifiers = [
 snt = "simple_note_taker.main:app"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.6"
 typer = "^0.3.2"
 colorama = "^0.4.4"
 tinydb = "^4.4.0"
