@@ -2,7 +2,7 @@ from dataclasses import asdict
 
 import typer
 
-from simple_note_taker.config import (
+from simple_note_taker.core.config import (
     Configuration,
     config,
     config_file_path,

@@ -8,12 +8,14 @@ from rapidfuzz import fuzz, process
 from tinydb import Query
 from tinydb.table import Table
 
-from simple_note_taker.config import config
-from simple_note_taker.core.database import NOTES_TABLE_NAME, tiny_db
+from simple_note_taker.core.config import config
+from simple_note_taker.core.database import tiny_db
 
 DATE_FORMAT = "%H:%M, %a %d %b %Y"
 
-_notes_db: Table = tiny_db.table(NOTES_TABLE_NAME)
+
+def _get_note_db(db_name: str = config.default_notebook) -> Table:
+    return tiny_db.table(db_name)
 
 
 class Note(BaseModel):
@@ -95,7 +97,7 @@ class Note(BaseModel):
         if run_magic:
             self._run_magic()
 
-        note_id = _notes_db.insert(self.dict())
+        note_id = _get_note_db().insert(self.dict())
         return Notes.get_by_id(note_id)
 
     def mark_as_done(self):
@@ -120,21 +122,21 @@ class NoteInDB(Note):
         return f"Note {self.doc_id}{spacer}"
 
     def delete(self) -> int:
-        remove_res = _notes_db.remove(doc_ids=[self.doc_id])
+        remove_res = _get_note_db().remove(doc_ids=[self.doc_id])
         return remove_res[0]
 
     def update(self, run_magic=False):
         if run_magic:
             self._run_magic()
 
-        update_res = _notes_db.update(self.dict(exclude={"doc_id"}), doc_ids=[self.doc_id])
+        update_res = _get_note_db().update(self.dict(exclude={"doc_id"}), doc_ids=[self.doc_id])
         return update_res
 
 
 class Notes:
     @staticmethod
     def all() -> List[NoteInDB]:
-        return [NoteInDB(**n, doc_id=n.doc_id) for n in _notes_db.all()]
+        return [NoteInDB(**n, doc_id=n.doc_id) for n in _get_note_db().all()]
 
     @staticmethod
     def latest() -> Optional[NoteInDB]:
@@ -146,7 +148,7 @@ class Notes:
 
     @staticmethod
     def get_by_id(doc_id: int) -> Optional[NoteInDB]:
-        res = _notes_db.get(doc_id=doc_id)
+        res = _get_note_db().get(doc_id=doc_id)
         if res is None:
             return None
         else:
@@ -158,13 +160,13 @@ class Notes:
             query = Query().tags.all(tags_list)
         else:
             query = Query().tags.any(tags_list)
-        search_res = _notes_db.search(query)
+        search_res = _get_note_db().search(query)
         return [NoteInDB(**n, doc_id=n.doc_id) for n in search_res]
 
     @staticmethod
     def find_match(query: str, field: str) -> List[NoteInDB]:
         query = Query()[field].search(query, flags=re.IGNORECASE)
-        search_res = _notes_db.search(query)
+        search_res = _get_note_db().search(query)
         return [NoteInDB(**n, doc_id=n.doc_id) for n in search_res]
 
     @staticmethod
@@ -177,7 +179,7 @@ class Notes:
 
     @staticmethod
     def all_tasks(include_complete: bool = False) -> List[NoteInDB]:
-        search_res = _notes_db.search(Query()["task"] == True)
+        search_res = _get_note_db().search(Query()["task"] == True)
         tasks = [NoteInDB(**n, doc_id=n.doc_id) for n in search_res]
         if include_complete:
             return tasks
@@ -192,3 +194,6 @@ class Notes:
             for note in Notes.all()
             if note.task and not note.task_complete and note.reminder is not None and note.reminder < now
         ]
+
+
+n = Notes("ws")

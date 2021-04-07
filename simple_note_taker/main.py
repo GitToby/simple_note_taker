@@ -3,7 +3,7 @@ from typing import List, Optional
 import pkg_resources
 import typer
 
-from simple_note_taker.config import config
+from simple_note_taker.core.config import config
 from simple_note_taker.core.notes import DATE_FORMAT, Note, NoteInDB, Notes
 from simple_note_taker.help_texts import *
 from simple_note_taker.subcommands.config import config_app
@@ -12,6 +12,9 @@ _DISTRIBUTION_METADATA = pkg_resources.get_distribution("simple_note_taker")
 
 __version__ = _DISTRIBUTION_METADATA.version
 
+app = typer.Typer(name="Simple Note Taker")
+app.add_typer(config_app, name="config")
+
 
 def version_callback(value: bool):
     if value:
@@ -19,23 +22,20 @@ def version_callback(value: bool):
         raise typer.Exit()
 
 
+def print_notes(notes_to_print: List[NoteInDB]) -> None:
+    for i, note in enumerate(notes_to_print):
+        typer.secho(" - " + note.pretty_str())
+
+
+@app.callback()
 def check_for_reminders(version: Optional[bool] = typer.Option(None, "--version", callback=version_callback)):
     reminders = Notes.due_reminders()
     if len(reminders) > 0:
         reminder_str = f"{len(reminders)} reminders due! Mark these as done soon."
-        typer.secho(reminder_str)
+        typer.secho(reminder_str, bold=True)
         typer.secho("-" * len(reminder_str))
         print_notes(reminders)
         typer.secho("-" * len(reminder_str))
-
-
-app = typer.Typer(name="Simple Note Taker", callback=check_for_reminders)
-app.add_typer(config_app, name="config")
-
-
-def print_notes(notes_to_print: List[NoteInDB]) -> None:
-    for note in notes_to_print:
-        typer.secho(" - " + note.pretty_str())
 
 
 # Insert Commands
@@ -43,7 +43,7 @@ def print_notes(notes_to_print: List[NoteInDB]) -> None:
 def take(
         note: str = typer.Option(..., prompt=TAKE_NOTE_PROMPT),
         private: bool = typer.Option(config.default_private),
-        tags: str = typer.Option(None, help=TAKE_NOTE_TAGS_HELP)
+        tags: str = typer.Option("", help=TAKE_NOTE_TAGS_HELP)
 ):
     """
     Take a note and save it. Include any of the magic commands to execute their functionality.
@@ -59,7 +59,8 @@ def take(
     !secret - Same as !private.
     """
     note_content = note.strip()
-    note = Note(content=note_content, private=private, tags=[t.strip() for t in tags.split(",")]).save()
+    tags_list = [t.strip() for t in tags.split(",")]
+    note = Note(content=note_content, private=private, tags=tags_list).save()
     note_str = "Note"
     reminder_str = ""
     if note.task:
@@ -98,7 +99,7 @@ def ls(count: int = typer.Argument(10, help=LS_COUNT_HELP)):
     if count == 0:
         count = len(all_notes)
     latest_notes = sorted(all_notes, reverse=True)[:count]
-    typer.secho(f"Last {min(count, len(latest_notes))} notes")
+    typer.secho(f"Last {min(count, len(latest_notes))} notes", bold=True, underline=True)
     print_notes(latest_notes)
 
 
@@ -125,6 +126,7 @@ def mark_done(note_id: int = typer.Argument(...)):
         note.mark_as_done()
         note.update(run_magic=False)
         typer.secho(f"Marked note {note_id} as done.")
+
     else:
         typer.secho(f"No note under id {note_id} found.")
         raise typer.Abort()

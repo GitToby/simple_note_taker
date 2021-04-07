@@ -27,6 +27,7 @@ class Configuration:
     default_private: bool = False
     share_enabled: bool = False
 
+    default_notebook: str = "notes"
     db_file_path: str = str(snt_home_dir / "database.json")
     metadata: MetaData = MetaData()
 
