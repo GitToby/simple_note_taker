@@ -4,6 +4,8 @@ Home: https://github.com/GitToby/simple_note_taker
 Pypi: https://pypi.org/project/simple-note-taker/
 
 # Features
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FGitToby%2Fsimple_note_taker.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FGitToby%2Fsimple_note_taker?ref=badge_shield)
+
 
 * Take notes via CLI and save to a flat json file.
 * Configure tasks and reminders in notes with magic commands such as `!task` and `!reminder`.
@@ -52,3 +54,6 @@ Commands:
 # Dev Setup
 
 Dev with [Poetry](https://python-poetry.org/). Run tests from root with `pytest`
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FGitToby%2Fsimple_note_taker.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FGitToby%2Fsimple_note_taker?ref=badge_large)
