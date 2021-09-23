@@ -11,6 +11,10 @@ jobs:
       - run: python -m pip install poetry
       - run: poetry install
       - run: poetry run pytest tests
+  two:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Hello world"
 
 
 
