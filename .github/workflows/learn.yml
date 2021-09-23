@@ -5,10 +5,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+        name: My Fist action
       - uses: actions/setup-python@v2
+        name: my second action
         with:
           python-version: '3.8'
       - run: python -m pip install poetry
+        name: the first run step
       - run: poetry install
       - run: poetry run pytest tests
   two:
