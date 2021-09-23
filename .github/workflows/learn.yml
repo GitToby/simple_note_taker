@@ -2,7 +2,7 @@ name: This is my fist flow!
 on: push
 jobs:
   one:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
