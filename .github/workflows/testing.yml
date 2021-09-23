@@ -3,13 +3,20 @@ on: push
 jobs:
   run_testing:
     runs-on: ubuntu-latest
+#    container: node:10.18-jessie
+#    services:
+#      postgres:
+#        image: postgres
+    strategy:
+      matrix:
+        python: [ '3.6','3.7','3.8' ]
     steps:
       - uses: actions/checkout@v2
         name: My Fist action
       - uses: actions/setup-python@v2
         name: my second action
         with:
-          python-version: '3.8'
+          python-version: ${{ matrix.python }}
       - run: python -m pip install poetry
         name: the first run step
       - run: poetry install
