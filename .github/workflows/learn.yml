@@ -14,10 +14,23 @@ jobs:
         name: the first run step
       - run: poetry install
       - run: poetry run pytest tests
+        continue-on-error: true
+      - uses: actions/upload-artifact@v2
+        with:
+          name: test-cov-results
+          path: htmlcov/*
   two:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Hello world"
+      - run: echo "the secret is $super_secret"
+        env:
+          super_secret: ${{ secrets.SUPERSECRET }}
+      - name: Download a single artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: test-cov-results
+      - run: ls -lah htmlcov
 
 
 
