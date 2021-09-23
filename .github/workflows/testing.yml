@@ -1,5 +1,5 @@
 name: This is my fist flow!
-on: push
+on: workflow_dispatch
 jobs:
   run_testing:
     runs-on: ubuntu-latest
