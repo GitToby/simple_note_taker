@@ -1,15 +1,17 @@
+python: [ '3.6','3.7','3.8', '3.9' ]  &python_versions
+
 name: Testing Flow
 on: workflow_dispatch
 jobs:
-  run_testing:
+  test:
     runs-on: ubuntu-latest
-#    container: node:10.18-jessie
-#    services:
-#      postgres:
-#        image: postgres
+    #    container: node:10.18-jessie
+    #    services:
+    #      postgres:
+    #        image: postgres
     strategy:
       matrix:
-        python: [ '3.6','3.7','3.8', '3.9' ]
+        <<: *python_versions
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -20,4 +22,10 @@ jobs:
       - run: python -m pip install poetry
         name: the first run step
       - run: poetry install
-      - run: poetry run pytest tests
+      - run: poetry run pytest tests\
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [ '3.6','3.7','3.8', '3.9' ]
