@@ -7,6 +7,7 @@ jobs:
     #    services:
     #      postgres:
     #        image: postgres
+    name: Test then build on Python ${{ matrix.python }}
     strategy:
       matrix:
         python: [ '3.6','3.7','3.8', '3.9' ]
