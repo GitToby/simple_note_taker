@@ -41,9 +41,9 @@ def check_for_reminders(version: Optional[bool] = typer.Option(None, "--version"
 # Insert Commands
 @app.command()
 def take(
-        note: str = typer.Option(..., prompt=TAKE_NOTE_PROMPT),
-        private: bool = typer.Option(config.default_private),
-        tags: str = typer.Option("", help=TAKE_NOTE_TAGS_HELP)
+    note: str = typer.Option(..., prompt=TAKE_NOTE_PROMPT),
+    private: bool = typer.Option(config.default_private),
+    tags: str = typer.Option("", help=TAKE_NOTE_TAGS_HELP),
 ):
     """
     Take a note and save it. Include any of the magic commands to execute their functionality.
@@ -160,8 +160,8 @@ def edit(note_id: int = typer.Argument(..., help=EDIT_NOTE_ID_HELP)):
 
 @app.command()
 def delete(
-        note_id: int = typer.Argument(..., help=DELETE_NOTE_ID_HELP),
-        force: bool = typer.Option(False),
+    note_id: int = typer.Argument(..., help=DELETE_NOTE_ID_HELP),
+    force: bool = typer.Option(False),
 ):
     """
     Delete a note you've taken.
