@@ -1,9 +1,9 @@
-python: [ '3.6','3.7','3.8', '3.9' ]  &python_versions
+y &python_versions
 
 name: Testing Flow
 on: workflow_dispatch
 jobs:
-  test:
+  test_and_build:
     runs-on: ubuntu-latest
     #    container: node:10.18-jessie
     #    services:
@@ -11,21 +11,25 @@ jobs:
     #        image: postgres
     strategy:
       matrix:
-        <<: *python_versions
+        python: [ '3.6','3.7','3.8', '3.9' ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
-        name: Setup Python Matrix
+        name: Setup Python ${{ matrix.python }}
         with:
           python-version: ${{ matrix.python }}
-      - run: echo "running python v$(python --version) at $(which python)"
+      - run: echo "running python $(python --version) at $(which python)"
       - run: python -m pip install poetry
-        name: the first run step
       - run: poetry install
-      - run: poetry run pytest tests\
+      - run: poetry run pytest . --cov-report=xml
+      - uses: actions/upload-artifact@v2
+        with:
+          name: test-coverage-xml
+          path: ./coverage.xml
+      - run: poetry run build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build-assets
+          path: ./dist/*
 
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python: [ '3.6','3.7','3.8', '3.9' ]
+

@@ -2,5 +2,9 @@
 dist
 .venv
 .idea
+.pytest_cache
+
+# coverage & testing
 .coverage
-**/htmlcov/**
+htmlcov
+coverage.xml
