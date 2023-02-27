@@ -4,8 +4,6 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Union
 
-from simple_note_taker import __version__
-
 APP_NAME = "simpleNoteTaker"
 
 snt_home_dir = Path().home() / f".{APP_NAME}"  # maybe migrate to `typer.get_app_dir(APP_NAME)`
@@ -17,11 +15,6 @@ if not Path(snt_home_dir).exists():
 
 
 @dataclass
-class MetaData:
-    cli_version: str = __version__  # used for when we need to prompt to update the cli config
-
-
-@dataclass
 class Configuration:
     username: str = None
     default_private: bool = False
@@ -29,7 +22,6 @@ class Configuration:
 
     default_notebook: str = "notes"
     db_file_path: str = str(snt_home_dir / "database.json")
-    metadata: MetaData = MetaData()
 
 
 def write_config_to_file(configuration: Configuration):

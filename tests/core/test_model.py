@@ -1,4 +1,3 @@
-import re
 from datetime import datetime, timedelta
 from unittest import TestCase
 from unittest.mock import patch
@@ -8,7 +7,7 @@ from tinydb.storages import MemoryStorage
 from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization.serializers import DateTimeSerializer
 
-from simple_note_taker.core.notes import Note
+from src.simple_note_taker.core.notes import Note
 
 _serialization = SerializationMiddleware(MemoryStorage)
 _serialization.register_serializer(DateTimeSerializer(), "TinyDate")

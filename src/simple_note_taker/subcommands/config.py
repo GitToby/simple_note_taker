@@ -38,7 +38,7 @@ def update():
     """
     conf_dict = {**asdict(Configuration()), **asdict(config)}
     write_config_to_file(Configuration(**conf_dict))
-    typer.secho(f"Updated missing config with default settings")
+    typer.secho("Updated missing config with default settings")
     print_config()
 
 
@@ -59,4 +59,4 @@ def enable_sharing():
     """
     config.share_enabled = True
     write_config_to_file(config)
-    typer.secho(f"Sharing is now enabled with the default settings,")
+    typer.secho("Sharing is now enabled with the default settings,")

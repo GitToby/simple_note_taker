@@ -134,11 +134,11 @@ class TestTakeMain(TestCase):
         assert len(result.stdout.split("\n")) == 3
         result2 = runner.invoke(app, ["tasks", "--include-complete"])
         assert result2.exit_code == 0
-        assert f"[x] | !task number 1" in result2.stdout.lower()
+        assert "[x] | !task number 1" in result2.stdout.lower()
         assert len(result2.stdout.split("\n")) == 4
 
     def test_mark_done(self):
-        runner.invoke(app, ["take", "--note", f"!task number 1"])
+        runner.invoke(app, ["take", "--note", "!task number 1"])
         result = runner.invoke(app, ["tasks"])
         assert result.exit_code == 0
         assert len(result.stdout.split("\n")) == 3

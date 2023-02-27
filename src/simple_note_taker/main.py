@@ -1,16 +1,12 @@
 from typing import List, Optional
 
-import pkg_resources
 import typer
 
+from simple_note_taker import __version__
 from simple_note_taker.core.config import config
 from simple_note_taker.core.notes import DATE_FORMAT, Note, NoteInDB, Notes
 from simple_note_taker.help_texts import *
 from simple_note_taker.subcommands.config import config_app
-
-_DISTRIBUTION_METADATA = pkg_resources.get_distribution("simple_note_taker")
-
-__version__ = _DISTRIBUTION_METADATA.version
 
 app = typer.Typer(name="Simple Note Taker")
 app.add_typer(config_app, name="config")
@@ -23,7 +19,7 @@ def version_callback(value: bool):
 
 
 def print_notes(notes_to_print: List[NoteInDB]) -> None:
-    for i, note in enumerate(notes_to_print):
+    for _i, note in enumerate(notes_to_print):
         typer.secho(" - " + note.pretty_str())
 
 

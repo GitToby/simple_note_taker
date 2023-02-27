@@ -1,33 +1,38 @@
-[tool.poetry]
+[project]
+authors = [
+    { name = "Toby Devlin", email = "toby@tobydevlin.com" },
+]
+requires-python = ">=3.7"
 name = "simple_note_taker"
-version = "0.2.4"
+dynamic = ["version"]
 description = "A simple CLI Notetaker with magic commands and options for centralization and summaries for teams"
-license = "Apache-2.0"
-authors = ["Toby Devlin <toby@tobydevlin.com>"]
-readme = 'README.md'
-repository = "https://github.com/GitToby/simple_note_taker"
+readme = "README.md"
 classifiers = [
-    "Development Status :: 3 - Alpha"
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: Apache Software License"
+]
+license = "Apache License 2.0"
+
+dependencies = [
+    "typer<1.0.0,>=0.3.2",
+    "colorama<1.0.0,>=0.4.4",
+    "tinydb<5.0.0,>=4.4.0",
+    "tinydb-serialization<3.0.0,>=2.1.0",
+    "pydantic<2.0.0,>=1.8.1",
+    "pytimeparse<2.0.0,>=1.1.8",
+    "rapidfuzz>=2.13.7",
+    "setuptools-scm>=7.1.0",
 ]
 
-[tool.poetry.scripts]
-snt = "simple_note_taker.main:app"
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest<7.0.0,>=6.2.2",
+    "pytest-cov<3.0.0,>=2.11.1",
+    "black<21.0,>=20.8b1",
+    "typer-cli<1.0.0,>=0.0.11",
+    "ruff>=0.0.252",
+]
 
-[tool.poetry.dependencies]
-python = "^3.6"
-typer = "^0.3.2"
-colorama = "^0.4.4"
-tinydb = "^4.4.0"
-tinydb-serialization = "^2.1.0"
-pydantic = "^1.8.1"
-pytimeparse = "^1.1.8"
-rapidfuzz = "^1.2.1"
-
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.2"
-pytest-cov = "^2.11.1"
-black = { version = "^20.8b1", allow-prereleases = true }
-typer-cli = "^0.0.11"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -37,10 +42,33 @@ testpaths = [
     "tests"
 ]
 
+
+[tool.ruff]
+select = ["E", "F", "B"]
+fixable = ["E", "F", "B"]
+ignore = ["B008"]
+
+line-length = 120
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
 [tool.black]
 line-length = 120
-target-version = ['py38']
+
+[tool.pdm]
+version = { source = "scm" }
+
+[tool.pdm.build]
+includes = []
 
 [build-system]
-requires = ["poetry_core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
+
+[project.urls]
+repository = "https://github.com/GitToby/simple_note_taker"
+pypi = "https://pypi.org/project/simple-note-taker/"
+
+[project.scripts]
+snt = "simple_note_taker.main:app"

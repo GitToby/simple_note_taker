@@ -4,3 +4,7 @@ dist
 .idea
 .coverage
 **/htmlcov/**
+/.pdm.toml
+/.pytest_cache/
+/.ruff_cache/
+/htmlcov/

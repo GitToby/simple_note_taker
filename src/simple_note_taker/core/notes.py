@@ -179,7 +179,7 @@ class Notes:
 
     @staticmethod
     def all_tasks(include_complete: bool = False) -> List[NoteInDB]:
-        search_res = _get_note_db().search(Query()["task"] == True)
+        search_res = _get_note_db().search(Query()["task"] is True)
         tasks = [NoteInDB(**n, doc_id=n.doc_id) for n in search_res]
         if include_complete:
             return tasks
@@ -196,4 +196,4 @@ class Notes:
         ]
 
 
-n = Notes("ws")
+n = Notes()
